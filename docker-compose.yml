@@ -1,0 +1,59 @@
+version: "3.9"
+services:
+  db:
+    container_name: postgres_clients
+    image: postgres:15.3-alpine
+    environment:
+      POSTGRES_DB: "clientDB"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    volumes:
+      - .:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+  broker:
+    image: docker.io/bitnami/kafka:latest
+    expose:
+      - '9092'
+    ports:
+      - '127.0.0.1:9092:9092'
+    container_name: broker
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://broker:9092 #PLAINTEXT://localhost:9092
+
+  zookeeper:
+    image: docker.io/bitnami/zookeeper:latest
+    container_name: zookeeper
+    expose:
+      - '2181'
+    ports:
+      - '127.0.0.1:2181:2181'
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: yes
+
+  producer:
+    container_name: producer
+    build:
+      dockerfile: app.Dockerfile
+    expose:
+      - 8080
+    ports:
+      - "127.0.0.1:8080:8080"
+    links:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/clientDB
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    depends_on:
+      - db
+      - broker
+
+volumes:
+  database_data:
+    driver: local
