@@ -1,1 +1,1 @@
-rootProject.name = "clients"
+rootProject.name = "Producer"
