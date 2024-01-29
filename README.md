@@ -1,5 +1,6 @@
 ## Тестовый проект по Kafka.
 Проект состоит из Producer'a(restApi) и Consumer'a, написанных на Spring, и брокера Kafka с хранилищем Zookeeper. Все сервисы и инфраструктура докеризированны с помощью Docker-compose.
+![kafka](screens/kafka.png)
 
 ### Поднять проект
 1. git clone https://github.com/Polliver-hub/KafkaDemo.git
